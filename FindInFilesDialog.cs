@@ -27,25 +27,74 @@ namespace Ndexer {
         }
 
         public class SearchQuery {
-            public readonly string Text;
             public readonly Regex Regex;
             public readonly string[] SearchWords;
+            public readonly ISearchOperator[] SearchOperators;
 
-            public SearchQuery(string regex, RegexOptions options) {
-                Text = regex;
-                Regex = new Regex(regex, RegexOptions.Compiled | RegexOptions.ExplicitCapture | options);
+            public SearchQuery(string text, SearchFlags options) {              
+                RegexOptions regexOptions = RegexOptions.None;
 
-                // Ph'nglui Mglw'nafh Regex R'lyeh wgah'nagl fhtagn
-                var tempRe = new Regex(regex, RegexOptions.ExplicitCapture);
-                var recode = tempRe.GetType().GetField("code", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(tempRe);
-                var words = (string[])(recode.GetType().GetField("_strings", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(recode));
-                var result = new List<string>();
-                foreach (var word in words) {
-                    if (word.Contains('\0'))
-                        continue;
+                if (options.HasFlag(SearchFlags.SearchOperators))
+                {
+                    List<string> tokens = text.Split(' ').ToList();
+                    var searchOperatorsList = new List<ISearchOperator>();
 
-                    result.Add(word);
+                    for (int i = 0; i < tokens.Count; )
+                    {
+                        string token = tokens[i];
+
+                        ISearchOperator aSearchOp = SearchOperatorFactory.GetSearchOperatorInstance(token);
+                        if (aSearchOp != null)
+                        {
+                            searchOperatorsList.Add(aSearchOp);
+                            tokens.Remove(token);
+                            continue;
+                        }
+
+                        i++;
+                    }
+
+                    text = String.Join(" ", tokens.ToArray());
+
+                    SearchOperators = searchOperatorsList.ToArray();
                 }
+
+                if ( !options.HasFlag(SearchFlags.SearchRegex) )
+                {
+                    text = Regex.Escape(text);
+                    regexOptions |= RegexOptions.CultureInvariant;
+                }
+
+                if ( !options.HasFlag(SearchFlags.SearchRegex) )
+                {
+                    text = text.ToLower();
+                    regexOptions |= RegexOptions.IgnoreCase;
+                    regexOptions |= RegexOptions.CultureInvariant;
+                }
+
+                Regex = new Regex(text, RegexOptions.Compiled | RegexOptions.ExplicitCapture | regexOptions);
+
+                var result = new List<string>();
+                if (options.HasFlag(SearchFlags.SearchRegex))
+                {
+                    // Ph'nglui Mglw'nafh Regex R'lyeh wgah'nagl fhtagn
+                    var tempRe = new Regex(text, RegexOptions.ExplicitCapture);
+                    var recode = tempRe.GetType().GetField("code", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(tempRe);
+                    var words = (string[])(recode.GetType().GetField("_strings", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(recode));
+
+                    result = new List<string>();
+                    foreach (var word in words)
+                    {
+                        if (word.Contains('\0'))
+                            continue;
+
+                        result.Add(word);
+                    }
+                }
+                else
+                    result.Add(text);
+                
+
                 SearchWords = result.ToArray();
             }
         }
@@ -128,6 +177,7 @@ namespace Ndexer {
         private TaskEnumerator<FtsResult> BuildQuery (SearchQuery search) {
             var query = Connection.BuildQuery(
                 @"SELECT SourceFiles_Path FROM FullText, SourceFiles WHERE " +
+                ( (search.SearchOperators != null && search.SearchOperators.Length > 0) ? search.SearchOperators.ToSQL() + @"AND ": @"") +
                 @"FullText.FileText MATCH ? AND " +
                 @"FullText.SourceFiles_ID = SourceFiles.SourceFiles_ID"
             );
@@ -351,22 +401,23 @@ namespace Ndexer {
             if ((searchText ?? "").Trim().Length == 0)
                 yield break;
 
-            RegexOptions regexOptions = RegexOptions.None;
+            SearchFlags searchFlags = SearchFlags.None;
 
-            if (btnEnableRegex.Checked == false) {
-                searchText = Regex.Escape(searchText);
-                regexOptions |= RegexOptions.CultureInvariant;
+            if (btnEnableRegex.Checked) {
+                searchFlags |= SearchFlags.SearchRegex;
             }
 
-            if (btnCaseSensitive.Checked == false) {
-                searchText = searchText.ToLower();
-                regexOptions |= RegexOptions.IgnoreCase;
-                regexOptions |= RegexOptions.CultureInvariant;
+            if (btnCaseSensitive.Checked) {
+                searchFlags |= SearchFlags.SearchCaseSensitive;
+            }
+
+            if (btnEnableSearchOp.Checked) {
+                searchFlags |= SearchFlags.SearchOperators;
             }
 
             SearchQuery search = null;
             try {
-                search = new SearchQuery(searchText, regexOptions);
+                search = new SearchQuery(searchText, searchFlags);
                 txtSearch.BackColor = SystemColors.Window;
             } catch {
                 txtSearch.BackColor = ErrorColor;
@@ -544,6 +595,10 @@ namespace Ndexer {
             SearchParametersChanged();
         }
 
+        private void btnEnableSearchOp_Click(object sender, EventArgs e) {
+            SearchParametersChanged();
+        }
+
         private void mnuCopyFilenames_Click (object sender, EventArgs e) {
             var sr = SearchResults;
             var hs = new HashSet<string>();
@@ -589,6 +644,11 @@ namespace Ndexer {
                 e.SuppressKeyPress = true;
                 OpenItem(lbResults.SelectedIndex);
             }
+        }
+
+        private void FindInFilesDialog_Load(object sender, EventArgs e)
+        {
+            btnEnableSearchOp.ToolTipText += SearchOperatorFactory.Description;
         }
     }
 #endif

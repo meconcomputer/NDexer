@@ -30,7 +30,6 @@ namespace Ndexer {
             this.sbStatus = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.pbProgress = new System.Windows.Forms.ToolStripProgressBar();
-            this.lbResults = new Ndexer.SearchResultListBox();
             this.cmResults = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.mnuCopyFilenames = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuCopyFilenamesAndLineNumbers = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,7 +38,9 @@ namespace Ndexer {
             this.tbrSearchOptions = new System.Windows.Forms.ToolStrip();
             this.btnCaseSensitive = new System.Windows.Forms.ToolStripButton();
             this.btnEnableRegex = new System.Windows.Forms.ToolStripButton();
+            this.btnEnableSearchOp = new System.Windows.Forms.ToolStripButton();
             this.btnClearSearchField = new System.Windows.Forms.Button();
+            this.lbResults = new Ndexer.SearchResultListBox();
             this.sbStatus.SuspendLayout();
             this.cmResults.SuspendLayout();
             this.tbrSearchOptions.SuspendLayout();
@@ -52,7 +53,7 @@ namespace Ndexer {
             this.txtSearch.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtSearch.Location = new System.Drawing.Point(2, 2);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(555, 30);
+            this.txtSearch.Size = new System.Drawing.Size(532, 30);
             this.txtSearch.TabIndex = 0;
             this.txtSearch.WordWrap = false;
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
@@ -88,26 +89,6 @@ namespace Ndexer {
             this.pbProgress.Size = new System.Drawing.Size(100, 19);
             this.pbProgress.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             // 
-            // lbResults
-            // 
-            this.lbResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbResults.ContextMenuStrip = this.cmResults;
-            this.lbResults.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this.lbResults.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbResults.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.lbResults.HorizontalScrollbar = true;
-            this.lbResults.IntegralHeight = false;
-            this.lbResults.Location = new System.Drawing.Point(2, 30);
-            this.lbResults.Name = "lbResults";
-            this.lbResults.ScrollAlwaysVisible = true;
-            this.lbResults.Size = new System.Drawing.Size(605, 420);
-            this.lbResults.TabIndex = 1;
-            this.lbResults.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbResults_DrawItem);
-            this.lbResults.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbResults_KeyDown);
-            this.lbResults.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbResults_MouseDoubleClick);
-            // 
             // cmResults
             // 
             this.cmResults.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -115,13 +96,13 @@ namespace Ndexer {
             this.mnuCopyFilenamesAndLineNumbers,
             this.mnuCopyFiles});
             this.cmResults.Name = "cmResults";
-            this.cmResults.Size = new System.Drawing.Size(259, 70);
+            this.cmResults.Size = new System.Drawing.Size(307, 76);
             // 
             // mnuCopyFilenames
             // 
             this.mnuCopyFilenames.Image = ((System.Drawing.Image)(resources.GetObject("mnuCopyFilenames.Image")));
             this.mnuCopyFilenames.Name = "mnuCopyFilenames";
-            this.mnuCopyFilenames.Size = new System.Drawing.Size(258, 22);
+            this.mnuCopyFilenames.Size = new System.Drawing.Size(306, 24);
             this.mnuCopyFilenames.Text = "&Copy Filenames";
             this.mnuCopyFilenames.Click += new System.EventHandler(this.mnuCopyFilenames_Click);
             // 
@@ -129,7 +110,7 @@ namespace Ndexer {
             // 
             this.mnuCopyFilenamesAndLineNumbers.Image = ((System.Drawing.Image)(resources.GetObject("mnuCopyFilenamesAndLineNumbers.Image")));
             this.mnuCopyFilenamesAndLineNumbers.Name = "mnuCopyFilenamesAndLineNumbers";
-            this.mnuCopyFilenamesAndLineNumbers.Size = new System.Drawing.Size(258, 22);
+            this.mnuCopyFilenamesAndLineNumbers.Size = new System.Drawing.Size(306, 24);
             this.mnuCopyFilenamesAndLineNumbers.Text = "Copy Filenames and Line &Numbers";
             this.mnuCopyFilenamesAndLineNumbers.Click += new System.EventHandler(this.mnuCopyFilenamesAndLineNumbers_Click);
             // 
@@ -137,7 +118,7 @@ namespace Ndexer {
             // 
             this.mnuCopyFiles.Image = ((System.Drawing.Image)(resources.GetObject("mnuCopyFiles.Image")));
             this.mnuCopyFiles.Name = "mnuCopyFiles";
-            this.mnuCopyFiles.Size = new System.Drawing.Size(258, 22);
+            this.mnuCopyFiles.Size = new System.Drawing.Size(306, 24);
             this.mnuCopyFiles.Text = "Copy &Files";
             this.mnuCopyFiles.Click += new System.EventHandler(this.mnuCopyFiles_Click);
             // 
@@ -156,11 +137,12 @@ namespace Ndexer {
             this.tbrSearchOptions.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.tbrSearchOptions.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnCaseSensitive,
-            this.btnEnableRegex});
-            this.tbrSearchOptions.Location = new System.Drawing.Point(560, 3);
+            this.btnEnableRegex,
+            this.btnEnableSearchOp});
+            this.tbrSearchOptions.Location = new System.Drawing.Point(537, 3);
             this.tbrSearchOptions.Name = "tbrSearchOptions";
             this.tbrSearchOptions.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.tbrSearchOptions.Size = new System.Drawing.Size(47, 25);
+            this.tbrSearchOptions.Size = new System.Drawing.Size(70, 25);
             this.tbrSearchOptions.TabIndex = 4;
             this.tbrSearchOptions.TabStop = true;
             this.tbrSearchOptions.Text = "toolStrip1";
@@ -191,17 +173,50 @@ namespace Ndexer {
             this.btnEnableRegex.ToolTipText = "Enable Regular Expressions";
             this.btnEnableRegex.Click += new System.EventHandler(this.btnEnableRegex_Click);
             // 
+            // btnEnableSearchOp
+            // 
+            this.btnEnableSearchOp.Checked = true;
+            this.btnEnableSearchOp.CheckOnClick = true;
+            this.btnEnableSearchOp.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.btnEnableSearchOp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnEnableSearchOp.Image = ((System.Drawing.Image)(resources.GetObject("btnEnableSearchOp.Image")));
+            this.btnEnableSearchOp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnEnableSearchOp.Name = "btnEnableSearchOp";
+            this.btnEnableSearchOp.Size = new System.Drawing.Size(23, 22);
+            this.btnEnableSearchOp.ToolTipText = "Enable Search Operators";
+            this.btnEnableSearchOp.Click += new System.EventHandler(this.btnEnableSearchOp_Click);
+            // 
             // btnClearSearchField
             // 
             this.btnClearSearchField.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClearSearchField.Image = ((System.Drawing.Image)(resources.GetObject("btnClearSearchField.Image")));
-            this.btnClearSearchField.Location = new System.Drawing.Point(532, 3);
+            this.btnClearSearchField.Location = new System.Drawing.Point(510, 4);
             this.btnClearSearchField.Name = "btnClearSearchField";
             this.btnClearSearchField.Size = new System.Drawing.Size(24, 24);
             this.btnClearSearchField.TabIndex = 5;
             this.btnClearSearchField.UseVisualStyleBackColor = true;
             this.btnClearSearchField.Visible = false;
             this.btnClearSearchField.Click += new System.EventHandler(this.btnClearSearchField_Click);
+            // 
+            // lbResults
+            // 
+            this.lbResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbResults.ContextMenuStrip = this.cmResults;
+            this.lbResults.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.lbResults.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbResults.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.lbResults.HorizontalScrollbar = true;
+            this.lbResults.IntegralHeight = false;
+            this.lbResults.Location = new System.Drawing.Point(2, 30);
+            this.lbResults.Name = "lbResults";
+            this.lbResults.ScrollAlwaysVisible = true;
+            this.lbResults.Size = new System.Drawing.Size(605, 420);
+            this.lbResults.TabIndex = 1;
+            this.lbResults.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lbResults_DrawItem);
+            this.lbResults.KeyDown += new System.Windows.Forms.KeyEventHandler(this.lbResults_KeyDown);
+            this.lbResults.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbResults_MouseDoubleClick);
             // 
             // FindInFilesDialog
             // 
@@ -219,6 +234,7 @@ namespace Ndexer {
             this.Text = "Search";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SearchDialog_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SearchDialog_FormClosed);
+            this.Load += new System.EventHandler(this.FindInFilesDialog_Load);
             this.sbStatus.ResumeLayout(false);
             this.sbStatus.PerformLayout();
             this.cmResults.ResumeLayout(false);
@@ -242,9 +258,10 @@ namespace Ndexer {
         private System.Windows.Forms.ToolStripMenuItem mnuCopyFilenamesAndLineNumbers;
         private System.Windows.Forms.ToolStrip tbrSearchOptions;
         private System.Windows.Forms.ToolStripButton btnCaseSensitive;
-        private System.Windows.Forms.ToolStripButton btnEnableRegex;
+        private System.Windows.Forms.ToolStripButton btnEnableSearchOp;
         private System.Windows.Forms.Button btnClearSearchField;
         private System.Windows.Forms.ToolStripMenuItem mnuCopyFiles;
+        private System.Windows.Forms.ToolStripButton btnEnableRegex;
     }
 #endif
 }

@@ -132,9 +132,14 @@
     <Compile Include="HotkeyControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="SearchOperators\ISearchOperator.cs" />
+    <Compile Include="SearchHelper.cs" />
+    <Compile Include="SearchOperators\SearchOperatorFactory.cs" />
+    <Compile Include="SearchOperators\SearchOperatorPath.cs" />
     <Compile Include="SearchResultListBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="SQLHelper.cs" />
     <Compile Include="TextEditors\SublimeText.cs" />
     <Compile Include="TextEditors\Director.cs" />
     <Compile Include="TextEditors\NotepadPlusPlus.cs" />
